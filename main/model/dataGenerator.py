@@ -296,17 +296,6 @@ def read_image_and_gt(img_files, gt_files, config):
 
     return imgs, Y
 
-
-
-
-
-
-
-
-
-
-
-
 def read_image_and_gt_with_original(img_files, gt_files, config):
     '''
     Transform images and send transformed image and label, but also return the image only resized
@@ -572,12 +561,6 @@ def read_image_and_gt_with_original(img_files, gt_files, config):
 
     return imgs, Y, imgs_only_resized
 
-
-
-
-
-
-
 @threadsafe_generator
 def generator_from_data_path(img_names, gt_names, config, return_filenames=False, shuffle=False ):
     """
@@ -642,10 +625,6 @@ def generator_from_data_path(img_names, gt_names, config, return_filenames=False
             i = j
             j += config.BATCH_SIZE
             count += 1
-
-
-
-
 
 def visualization_generator_from_data_path(img_names, gt_names, config, return_filenames=False, shuffle=False ):
     """

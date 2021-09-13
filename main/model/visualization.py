@@ -5,6 +5,7 @@
 # Organisation: searchInk
 # Email: christopher@searchink.com
 
+from scripts.test import BATCH_SIZE
 from main.model.evaluation import filter_batch
 import cv2
 import numpy as np
@@ -21,51 +22,29 @@ def visualize(model, generator, config):
     Returns:
         [type] -- numpy array of images with ground truth and prediction boxes added
     """
-
-
     #this is needed, if batch size is smaller than visualization batch size
     nbatches, mod = divmod( config.VISUALIZATION_BATCH_SIZE, config.BATCH_SIZE )
-
-
-
     print("  Creating Visualizations...")
     #iterate one batch
-
     count = 0
-
-
     all_boxes = []
-
     for images, y_true, images_only_resized in generator:
-
-
-
         #predict on batch
         y_pred = model.predict(images)
-
-
         #create visualizations
         images_with_boxes = visualize_dt_and_gt(images_only_resized, y_true, y_pred, config)
-
         #lazy hack if nothing was detected
         try:
             all_boxes.append(np.stack(images_with_boxes))
         except:
             pass
-
-
-
-
         count += 1
-
         if count >= nbatches:
             break
     try:
         return np.stack(all_boxes).reshape((-1, config.IMAGE_HEIGHT, config.IMAGE_WIDTH, 3))
     except:
         return np.zeros( (nbatches*config.BATCH_SIZE, config.IMAGE_HEIGHT, config.IMAGE_WIDTH, 3))
-
-
 
 def visualize_dt_and_gt(images, y_true, y_pred, config):
     """Takes a batch of images and creates bounding box visualization on top
@@ -87,6 +66,7 @@ def visualize_dt_and_gt(images, y_true, y_pred, config):
     img_with_boxes = []
 
     #filter batch with nms
+    print(y_pred.shape)
     all_filtered_boxes, all_filtered_classes, all_filtered_scores = filter_batch(y_pred, config)
 
 
@@ -145,22 +125,4 @@ def visualize_dt_and_gt(images, y_true, y_pred, config):
     return img_with_boxes
 
 
-
-
-
-
-
-
-def bbox_transform_single_box(bbox):
-    """convert a bbox of form [cx, cy, w, h] to [xmin, ymin, xmax, ymax]. Works
-    for numpy array or list of tensors.
-    """
-    cx, cy, w, h = bbox
-    out_box = [[]]*4
-    out_box[0] = int(np.floor(cx-w/2))
-    out_box[1] = int(np.floor(cy-h/2))
-    out_box[2] = int(np.floor(cx+w/2))
-    out_box[3] = int(np.floor(cy+h/2))
-
-    return out_box
 
